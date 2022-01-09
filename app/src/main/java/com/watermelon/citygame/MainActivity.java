@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         bt = findViewById(R.id.button);
         cityFieldAuto = findViewById(R.id.city_field_auto);
         cityField = findViewById(R.id.city_field);
-        
+
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
