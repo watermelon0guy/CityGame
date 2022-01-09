@@ -39,10 +39,8 @@ public class MainActivity extends AppCompatActivity {
         cityFieldAuto = findViewById(R.id.city_field_auto);
         cityField = findViewById(R.id.city_field);
         ArrayList<String> cities_original = fileToArray(R.raw.city);
-        ArrayList<String> cities_current = new ArrayList<>(cities_original.size());
+        ArrayList<String> cities_current = (ArrayList<String>)cities_original.clone();
 
-        Collections.copy(cities_original, cities_current);
-        
         int index = Math.abs((int)(Math.random() * cities_original.size() - 1));
 
         cityFieldAuto.setText(cities_original.get(index));
@@ -50,16 +48,39 @@ public class MainActivity extends AppCompatActivity {
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String str = cityField.getText().toString();
-                String autoCity = cityFieldAuto.getText().toString();
-                if(str.length() == 0)
+                String autoCityStr = cityFieldAuto.getText().toString();
+                String cityStr = cityField.getText().toString();
+                boolean flag = true;
+                if(cityStr.length() == 0)
                     Toast.makeText(MainActivity.this, "Ты ничего не написал", Toast.LENGTH_SHORT).show();
-                else if (str.toLowerCase().charAt(0) != autoCity.charAt(autoCity.length()-1))
+                else if (cityStr.toLowerCase().charAt(0) != autoCityStr.charAt(autoCityStr.length() - 1))
                 {
                     Toast.makeText(MainActivity.this, "Слово не подходит", Toast.LENGTH_SHORT).show();
                 }
+                else if(!contain(cityStr,cities_current))
+                {
+                    Toast.makeText(MainActivity.this, "Такого слова нет или оно уже было :D", Toast.LENGTH_SHORT).show();
+                }
                 else {
-
+                    Collections.shuffle(cities_current);
+                    for (int i = 0; i < cities_current.size(); i++) {
+                        String city = cities_current.get(i);
+                        if (city.toLowerCase().charAt(0) == cityStr.toLowerCase().charAt(cityStr.length()-1))
+                        {
+                            if (cityStr.toLowerCase().charAt(cityStr.length()-1)=='ь' || cityStr.toLowerCase().charAt(cityStr.length()-1)=='ы' || cityStr.toLowerCase().charAt(cityStr.length()-1)=='й')
+                                continue;
+                            cityFieldAuto.setText(city);
+                            cityField.setText("");
+                            cities_current.remove(i);
+                            Toast.makeText(MainActivity.this, "Слово нашлось!", Toast.LENGTH_SHORT).show();
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag){
+                        cityFieldAuto.setText("Слова на такую букву нет. Вы победили!");
+                        bt.setClickable(false);
+                    }
                 }
             }
         });
@@ -78,5 +99,17 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return cities;
+    }
+
+    Boolean contain(String string, ArrayList<String> list)
+    {
+        for (String str :
+                list) {
+            if(str.equals(string)) {
+                list.remove(str);
+                return true;
+            }
+        }
+        return false;
     }
 }
